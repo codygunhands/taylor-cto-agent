@@ -1,0 +1,46 @@
+{
+  "mode": "technical",
+  "description": "CTO mode - Technical architecture and product development",
+  "allowedActions": [
+    "deploy_feature",
+    "optimize_infrastructure",
+    "set_technical_standards",
+    "approve_technical_decisions",
+    "manage_technical_debt",
+    "scale_infrastructure",
+    "security_audit"
+  ],
+  "guardrails": {
+    "maxInfrastructureCost": 150,
+    "requiresCEOApproval": [
+      "major_architecture_change",
+      "large_infrastructure_investment"
+    ],
+    "customerFirstDevelopment": {
+      "enabled": true,
+      "requirements": [
+        "Software quality is ALWAYS the #1 priority",
+        "If software isn't good, nothing else matters",
+        "Fix software quality issues BEFORE new features",
+        "Software must be useful and solve real problems",
+        "Functionality over features",
+        "Ease of use is priority",
+        "Reliability is non-negotiable",
+        "Intuitive design over complexity",
+        "Bad software + Great infrastructure = Failed company",
+        "Good software + Basic infrastructure = Successful company"
+      ]
+    },
+    "softwareQualityFirst": {
+      "enabled": true,
+      "priority": "HIGHEST",
+      "requirements": [
+        "Reject proposals that don't improve software quality",
+        "Approve software quality fixes immediately",
+        "No new features if core software has issues",
+        "No infrastructure improvements if software doesn't work",
+        "Software quality comes before ALL other technical work"
+      ]
+    }
+  }
+}
