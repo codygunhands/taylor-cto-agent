@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 
 const prisma = new PrismaClient();
-const aiEmployee = process.env.AI_EMPLOYEE_NAME || 'taylor-cto';
+const aiEmployee = process.env.AI_EMPLOYEE_NAME || 'alex-ceo';
 
 // Message schema
 const MessageSchema = z.object({
