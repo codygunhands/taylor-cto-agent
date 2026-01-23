@@ -48,16 +48,17 @@ export class AgentService {
   async processRequest(request: AgentRequest): Promise<AgentResponse> {
     const startTime = Date.now();
 
-    // Initialize guardrails for this mode
-    const guardrails = new Guardrails(request.mode);
-    const policy = guardrails.getPolicy();
-    const kbVersion = guardrails.getKBVersion();
+    try {
+      // Initialize guardrails for this mode
+      const guardrails = new Guardrails(request.mode);
+      const policy = guardrails.getPolicy();
+      const kbVersion = guardrails.getKBVersion();
 
-    // Get AI employee name from environment (defaults to 'jeff')
-    const aiEmployee = process.env.AI_EMPLOYEE_NAME || 'jeff';
-    
-    // Update or create session
-    const session = await this.prisma.session.upsert({
+      // Get AI employee name from environment (defaults to 'jeff')
+      const aiEmployee = process.env.AI_EMPLOYEE_NAME || 'jeff';
+      
+      // Update or create session
+      const session = await this.prisma.session.upsert({
       where: { id: request.sessionId },
       create: {
         id: request.sessionId,
@@ -247,15 +248,27 @@ export class AgentService {
       }
     }
 
-    return {
-      reply: finalResponse,
-      actions: validActions,
-      confidence: 0.8, // Could be computed from model response
-      citations: citations.map(c => ({
-        doc: c.doc,
-        anchor: c.anchor || '',
-      })),
-    };
+      return {
+        reply: finalResponse,
+        actions: validActions,
+        confidence: 0.8, // Could be computed from model response
+        citations: citations.map(c => ({
+          doc: c.doc,
+          anchor: c.anchor || '',
+        })),
+      };
+    } catch (error: any) {
+      // Log the actual error for debugging
+      console.error('AgentService.processRequest error:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name,
+        code: error.code,
+      });
+      
+      // Re-throw with more context
+      throw new Error(`Failed to process request: ${error.message}`);
+    }
   }
 
   private calculateConfidence(
