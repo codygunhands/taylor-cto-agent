@@ -4,9 +4,22 @@ import { AgentRequestSchema } from '../types';
 import { z } from 'zod';
 
 export async function agentRoutes(fastify: FastifyInstance) {
-  const agentService = new AgentService();
+  let agentService: AgentService;
+  try {
+    agentService = new AgentService();
+  } catch (error: any) {
+    fastify.log.error('Failed to initialize AgentService:', error.message);
+    // Don't throw - register route anyway, it will handle the error
+    agentService = null as any;
+  }
 
   fastify.post('/v1/agent', async (request: FastifyRequest, reply: FastifyReply) => {
+    if (!agentService) {
+      return reply.status(500).send({
+        error: 'Agent service not initialized',
+        message: 'AgentService failed to initialize. Check environment variables and database connection.',
+      });
+    }
     try {
       // Rate limiting would be handled by middleware
       const body = AgentRequestSchema.parse(request.body);
