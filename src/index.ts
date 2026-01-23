@@ -13,6 +13,24 @@ const fastify = Fastify({
       },
     } : undefined,
   },
+  disableRequestLogging: false,
+});
+
+// Global error handler
+fastify.setErrorHandler((error, request, reply) => {
+  fastify.log.error({
+    err: error,
+    url: request.url,
+    method: request.method,
+  }, 'Unhandled error');
+  
+  const statusCode = error.statusCode || 500;
+  const message = error.message || 'Internal server error';
+  
+  reply.status(statusCode).send({
+    error: message,
+    message: (process.env.NODE_ENV === 'development' || process.env.LOG_LEVEL === 'debug') ? error.message : undefined,
+  });
 });
 
 // Register routes
