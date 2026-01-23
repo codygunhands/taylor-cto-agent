@@ -77,6 +77,14 @@ const start = async () => {
       try {
         fastify.log.info('Running database migrations on startup...');
         const { execSync } = require('child_process');
+        // Generate Prisma client first
+        execSync('npx prisma generate', {
+          encoding: 'utf-8',
+          env: { ...process.env },
+          stdio: 'inherit',
+          timeout: 60000,
+        });
+        // Then run migrations
         execSync('npx prisma migrate deploy', {
           encoding: 'utf-8',
           env: { ...process.env },
@@ -85,9 +93,12 @@ const start = async () => {
         });
         fastify.log.info('✅ Migrations completed');
       } catch (migrationError: any) {
-        fastify.log.warn('⚠️  Migrations failed (will retry via endpoint):', migrationError.message);
-        // Don't exit - app can still run, migrations can be run manually
+        fastify.log.error('❌ Migrations failed:', migrationError.message);
+        fastify.log.error('   This will cause 500 errors. Migrations must succeed for the app to work.');
+        // Don't exit - let the app start but it will fail on requests
       }
+    } else {
+      fastify.log.warn('⚠️  DATABASE_URL not set - migrations skipped');
     }
     
     // Initialize board communication
