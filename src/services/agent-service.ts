@@ -91,8 +91,9 @@ export class AgentService {
       },
     });
 
-    // Pre-LLM guardrails check
-    const preCheck = guardrails.checkPreLLM(request.message, request.channel);
+    // Pre-LLM guardrails check (pass metadata to check for owner/operator context)
+    const metadata = request.metadata || {};
+    const preCheck = guardrails.checkPreLLM(request.message, request.channel, metadata);
     if (preCheck.shouldBlock && preCheck.response) {
       // Save assistant response
       await this.prisma.message.create({
