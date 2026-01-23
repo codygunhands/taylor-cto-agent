@@ -53,9 +53,26 @@ export async function agentRoutes(fastify: FastifyInstance) {
         name: error.name,
         code: error.code,
       }, 'Agent route error');
+      
+      // Return more helpful error messages
+      let errorMessage = 'Internal server error';
+      if (error.message?.includes('GRADIENT_API_KEY')) {
+        errorMessage = 'GRADIENT_API_KEY is not configured';
+      } else if (error.message?.includes('GRADIENT_MODEL')) {
+        errorMessage = 'GRADIENT_MODEL is not configured';
+      } else if (error.message?.includes('DATABASE_URL')) {
+        errorMessage = 'DATABASE_URL is not configured';
+      } else if (error.message?.includes('schema not initialized')) {
+        errorMessage = 'Database schema not initialized. Run Prisma migrations.';
+      } else if (error.message?.includes('Database connection failed')) {
+        errorMessage = 'Database connection failed. Check DATABASE_URL.';
+      } else if (process.env.NODE_ENV === 'development' || process.env.LOG_LEVEL === 'debug') {
+        errorMessage = error.message || 'Internal server error';
+      }
+      
       return reply.status(500).send({
-        error: 'Internal server error',
-        message: process.env.NODE_ENV === 'development' ? error.message : undefined,
+        error: errorMessage,
+        message: (process.env.NODE_ENV === 'development' || process.env.LOG_LEVEL === 'debug') ? error.message : undefined,
       });
     }
   });
