@@ -69,9 +69,20 @@ export async function agentRoutes(fastify: FastifyInstance) {
         errorMessage = error.message || 'Internal server error';
       }
       
+      // Always return error message for initialization and configuration errors
+      const shouldShowDetails = 
+        process.env.NODE_ENV === 'development' || 
+        process.env.LOG_LEVEL === 'debug' ||
+        errorMessage !== 'Internal server error';
+      
       return reply.status(500).send({
         error: errorMessage,
-        message: (process.env.NODE_ENV === 'development' || process.env.LOG_LEVEL === 'debug') ? error.message : undefined,
+        message: shouldShowDetails ? error.message : undefined,
+        details: (process.env.NODE_ENV === 'development' || process.env.LOG_LEVEL === 'debug') ? {
+          stack: error.stack,
+          name: error.name,
+          code: error.code,
+        } : undefined,
       });
     }
   });
