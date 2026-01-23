@@ -15,18 +15,31 @@ export class AgentService {
 
   constructor() {
     // Write client (primary database)
+    const dbUrl = process.env.DATABASE_URL;
+    if (!dbUrl || dbUrl === 'postgresql://dummy:dummy@dummy:5432/dummy') {
+      throw new Error('DATABASE_URL is required and must be a valid database URL');
+    }
+    
     this.prisma = new PrismaClient({
       datasources: {
-        db: { url: process.env.DATABASE_URL },
+        db: { url: dbUrl },
       },
     });
     
     // Read client (read replica)
     this.prismaRead = new PrismaClient({
       datasources: {
-        db: { url: process.env.DATABASE_READ_URL || process.env.DATABASE_URL },
+        db: { url: process.env.DATABASE_READ_URL || dbUrl },
       },
     });
+    
+    // Validate required env vars before creating providers
+    if (!process.env.GRADIENT_API_KEY) {
+      throw new Error('GRADIENT_API_KEY is required');
+    }
+    if (!process.env.GRADIENT_MODEL) {
+      throw new Error('GRADIENT_MODEL is required');
+    }
     
     this.gradient = new GradientProvider();
     this.kb = new KnowledgeBase();
