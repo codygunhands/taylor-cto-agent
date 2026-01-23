@@ -57,20 +57,29 @@ export class AgentService {
       // Get AI employee name from environment (defaults to 'jeff')
       const aiEmployee = process.env.AI_EMPLOYEE_NAME || 'jeff';
       
-      // Update or create session
-      const session = await this.prisma.session.upsert({
-      where: { id: request.sessionId },
-      create: {
-        id: request.sessionId,
-        mode: request.mode,
-        lastChannel: request.channel,
-        aiEmployee: aiEmployee,
-      },
-      update: {
-        lastChannel: request.channel,
-        updatedAt: new Date(),
-      },
-    });
+    // Update or create session (with error handling)
+    let session;
+    try {
+      session = await this.prisma.session.upsert({
+        where: { id: request.sessionId },
+        create: {
+          id: request.sessionId,
+          mode: request.mode,
+          lastChannel: request.channel,
+          aiEmployee: aiEmployee,
+        },
+        update: {
+          lastChannel: request.channel,
+          updatedAt: new Date(),
+        },
+      });
+    } catch (dbError: any) {
+      // If database error, check if it's a schema issue
+      if (dbError.code === 'P2021' || dbError.message?.includes('does not exist')) {
+        throw new Error('Database schema not initialized. Run Prisma migrations.');
+      }
+      throw dbError;
+    }
 
     // Save user message
     await this.prisma.message.create({
