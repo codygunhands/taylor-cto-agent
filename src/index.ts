@@ -2,6 +2,8 @@ import Fastify, { FastifyRequest, FastifyReply } from 'fastify';
 import { agentRoutes } from './routes/agent';
 import { internalRoutes } from './routes/internal';
 import { migrationRoutes } from './routes/migrations';
+// Board routes disabled - Prisma models not in schema
+// import { boardRoutes } from './routes/board';
 
 const fastify = Fastify({
   logger: {
@@ -37,6 +39,8 @@ fastify.setErrorHandler((error, request, reply) => {
 fastify.register(agentRoutes);
 fastify.register(internalRoutes, { prefix: '/internal' });
 fastify.register(migrationRoutes);
+// Board routes disabled - Prisma models not in schema
+// fastify.register(boardRoutes, { prefix: '/v1' });
 
 // Rate limiting middleware (simple in-memory for now)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();

@@ -34,11 +34,17 @@ const DecisionSchema = z.object({
 });
 
 export async function boardRoutes(fastify: FastifyInstance) {
+  // Board routes disabled - Prisma models (boardMessage, boardProposal, boardDecision) not in schema
+  // These routes will be re-enabled when the schema is updated
+  fastify.log.warn('Board routes are disabled - Prisma models not available');
+  return;
+  
   // Send message to board member(s)
   fastify.post('/v1/board/message', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       const body = MessageSchema.parse(request.body);
       
+      // @ts-ignore - Prisma model not in schema
       const message = await prisma.boardMessage.create({
         data: {
           from: aiEmployee,

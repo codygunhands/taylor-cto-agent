@@ -9,10 +9,10 @@ export async function agentRoutes(fastify: FastifyInstance) {
     try {
       agentService = new AgentService();
     } catch (initError: any) {
-      fastify.log.error('Failed to initialize AgentService:', {
-        message: initError.message,
-        stack: initError.stack,
-      });
+      fastify.log.error(`Failed to initialize AgentService: ${initError.message}`);
+      if (initError.stack) {
+        fastify.log.error(initError.stack);
+      }
       return reply.status(500).send({
         error: 'Agent service initialization failed',
         message: initError.message || 'Check environment variables and database connection',
