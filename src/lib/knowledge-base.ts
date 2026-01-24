@@ -57,6 +57,7 @@ export class KnowledgeBase {
       operator: ['onboarding_steps.md', 'support_playbook.md'],
       marketing: ['marketing_playbook.md'],
       technical: ['technical_framework.md'],
+      strategic: [],
     };
     
     // For technical mode, load from cto subdirectory
